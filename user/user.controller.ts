@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import signupModel from "./user.model";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { configuration } from "../config/config";
 
 export const Signup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -18,7 +20,7 @@ export const Signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const hashedPassword =  await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const userData = await signupModel.create({
       name,
@@ -34,7 +36,17 @@ export const Signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    res.status(201).json({ msg: "User created successfully", success: true });
+    const token = jwt.sign(
+      { id: userData?._id },
+      configuration.JWT_TOKEN as string,
+      { expiresIn: "1h" }
+    );
+
+    res.status(201).json({
+      msg: "User created successfully",
+      success: true,
+      accessToken: token,
+    });
   } catch (err) {
     if (err instanceof Error) {
       res.status(500).json({
@@ -50,4 +62,57 @@ export const Signup = async (req: Request, res: Response): Promise<void> => {
       });
     }
   }
+};
+
+export const Login = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({ msg: "All fields are required", success: false });
+      return;
+    };
+
+    const User = await signupModel.findOne({ email });
+
+    if (!User) {
+      res.status(404).json({ message: "User not found", success: false });
+
+      return;
+    };
+
+    const isMatch = await bcrypt.compare(password, User.password);
+
+    if (!isMatch) {
+      res.status(401).json({ message: "Invalid credentials", success: false });
+
+      return;
+    };
+
+    const token = jwt.sign(
+      { id: User?._id },
+      configuration.JWT_TOKEN as string,
+      { expiresIn: "1h" }
+    );
+
+    res
+      .status(200)
+      .json({
+        message: "User login successfull",
+        success: true,
+        accessToken: token,
+      });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error?.message,
+        success: false,
+      });
+    } else {
+      res
+        .status(500)
+        .json({ message: "An unknown error occured", success: false });
+    };
+  };
 };

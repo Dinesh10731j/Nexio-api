@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import signupModel from "./user.model";
+import { signupModel, contactModel } from "./user.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { configuration } from "../config/config";
@@ -15,7 +15,7 @@ export const Signup = async (req: Request, res: Response): Promise<void> => {
     const alreadyExists = await signupModel.findOne({ email });
 
     if (alreadyExists) {
-      res.status(400).json({ msg: "User already exits", success: false });
+      res.status(400).json({ message: "User already exits", success: false });
 
       return;
     }
@@ -43,7 +43,7 @@ export const Signup = async (req: Request, res: Response): Promise<void> => {
     );
 
     res.status(201).json({
-      msg: "User created successfully",
+      message: "User created successfully",
       success: true,
       accessToken: token,
     });
@@ -71,7 +71,7 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
     if (!email || !password) {
       res.status(400).json({ msg: "All fields are required", success: false });
       return;
-    };
+    }
 
     const User = await signupModel.findOne({ email });
 
@@ -79,7 +79,7 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
       res.status(404).json({ message: "User not found", success: false });
 
       return;
-    };
+    }
 
     const isMatch = await bcrypt.compare(password, User.password);
 
@@ -87,7 +87,7 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
       res.status(401).json({ message: "Invalid credentials", success: false });
 
       return;
-    };
+    }
 
     const token = jwt.sign(
       { id: User?._id },
@@ -95,13 +95,11 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
       { expiresIn: "1h" }
     );
 
-    res
-      .status(200)
-      .json({
-        message: "User login successfull",
-        success: true,
-        accessToken: token,
-      });
+    res.status(200).json({
+      message: "User login successfull",
+      success: true,
+      accessToken: token,
+    });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({
@@ -113,6 +111,50 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
       res
         .status(500)
         .json({ message: "An unknown error occured", success: false });
-    };
-  };
+    }
+  }
+};
+
+export const userContact = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      res
+        .status(400)
+        .json({ message: "All fields are required", success: false });
+      return;
+    }
+
+    const alreadyExists = await contactModel.findOne({ email });
+
+    if (alreadyExists) {
+      res.status(400).json({ msg: "Message already exits", success: false });
+      return;
+    }
+
+    const userContacts = await contactModel.create({ name, email, message });
+
+    if (!userContacts) {
+      res.status(500).json({ msg: "Failed to create message", success: false });
+      return;
+    }
+
+    res.status(201).json({ msg: "Message created sucessfully", success: true });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Internal server error",
+        success: false,
+        error: error?.message,
+      });
+    } else {
+      res
+        .status(500)
+        .json({ message: "An unknown error occured", success: false });
+    }
+  }
 };

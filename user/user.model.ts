@@ -1,29 +1,43 @@
-import { signupType } from "../types/types";
+import { signupType, contactType } from "../types/types";
 import mongoose from "mongoose";
 
-
 const signupSchema = new mongoose.Schema<signupType>({
-    name:{
-        type:String,
-        required:[true,'Name is required']
-    },
+  name: {
+    type: String,
+    required: [true, "Name is required"],
+  },
 
-    email:{
-        type:String,
-        required:[true,'E-mail is required'],
-    },
+  email: {
+    type: String,
+    required: [true, "E-mail is required"],
+  },
 
-
-    password:{
-        type:String,
-        required:[true,'Password is required']
-    }
-
-
+  password: {
+    type: String,
+    required: [true, "Password is required"],
+  },
 });
 
+const contactSchema = new mongoose.Schema<contactType>({
+  name: {
+    type: String,
+    required: [true, "Name is required"],
+  },
 
+  email: {
+    type: String,
+    required: [true, "E-mail is required"],
+  },
 
-const signupModel = mongoose.model<signupType>('Users',signupSchema);
+  message: {
+    type: String,
+    required: [true, "Message is required"],
+  },
+});
 
-export default signupModel;
+export const contactModel = mongoose.model<contactType>(
+  "Contacts",
+  contactSchema
+);
+
+export const signupModel = mongoose.model<signupType>("Users", signupSchema);

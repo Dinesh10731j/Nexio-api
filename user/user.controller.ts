@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import signupModel from "./user.model";
+import bcrypt from "bcryptjs";
 
 export const Signup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -9,7 +10,21 @@ export const Signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const userData = await signupModel.create({ name, email, password });
+    const alreadyExists = await signupModel.findOne({ email });
+
+    if (alreadyExists) {
+      res.status(400).json({ msg: "User already exits", success: false });
+
+      return;
+    }
+
+    const hashedPassword =  await bcrypt.hash(password, 10);
+
+    const userData = await signupModel.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
     if (!userData) {
       res

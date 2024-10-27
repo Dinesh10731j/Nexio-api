@@ -132,18 +132,18 @@ export const userContact = async (
     const alreadyExists = await contactModel.findOne({ email });
 
     if (alreadyExists) {
-      res.status(400).json({ msg: "Message already exits", success: false });
+      res.status(400).json({ message: "Message already exits", success: false });
       return;
     }
 
     const userContacts = await contactModel.create({ name, email, message });
 
     if (!userContacts) {
-      res.status(500).json({ msg: "Failed to create message", success: false });
+      res.status(500).json({ message: "Failed to create message", success: false });
       return;
     }
 
-    res.status(201).json({ msg: "Message created sucessfully", success: true });
+    res.status(201).json({ message: "Message created sucessfully", success: true });
   } catch (error: unknown) {
     if (error instanceof Error) {
       res.status(500).json({

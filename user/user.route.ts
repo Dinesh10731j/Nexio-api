@@ -1,6 +1,6 @@
 import express from "express";
 import { Signup, Login, userContact } from "./user.controller";
-const userRouter = express();
+const userRouter = express.Router();
 
 userRouter.post("/user/signup", Signup);
 userRouter.post("/user/login", Login);

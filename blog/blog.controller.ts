@@ -45,3 +45,26 @@ if(!newBlogPost){
     }
   }
 };
+
+
+
+export const Blogs = async (req:Request,res:Response):Promise<void>=>{
+  try{
+    const blogs = await blogModel.find({});
+
+    if(!blogs || blogs.length === 0){
+      res.status(404).json({message:'No blogs available.',success:false});
+      return;
+    };
+
+    res.status(200).json({message:'Blogs fetched successfully',success:true,Blogs:blogs});
+
+  }catch(error:unknown){
+    if(error instanceof Error){
+      res.status(500).json({message:'Internal server error',success:false,error:error.message})
+    }else{
+      res.status(500).json({message:'An unknown error occured',success:false});
+    };
+  };
+
+};

@@ -1,19 +1,35 @@
 import { Request, Response } from "express";
 import { blogModel } from "./blog.model";
-export const createBlog = async (req: Request, res: Response) => {
+import { parseEditorData } from "../utils/parseEditorData";
+export const createBlog = async (req: Request, res: Response):Promise<void> => {
   try {
-const {blog} = req.body;
-const blogs = await blogModel.create({blog});
+    const {blocks} = req.body;
+    const { title, image, content } = parseEditorData(blocks);
 
 
-if(!blogs){
-    res.status(400).json({message:'Failed to create blog'});
+    if(!title || !image || !content){
+    res.status(400).json({message:'Empty data received',success:false});
     return;
+    }
+    const newBlogPost = new blogModel({
+      title,
+      image,
+      content,
+    });
+    await newBlogPost.save();
 
-    
+    res.status(201).json({ message: 'Blog post created successfully', data: newBlogPost });
+
+
+if(!newBlogPost){
+   res.status(400).json({message:'Failed to create blog'});
+   return;
+
 }
 
-  } catch (error: unknown) {
+
+  } 
+  catch (error: unknown) {
     if (error instanceof Error) {
       res
         .status(500)

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { blogModel } from "./blog.model";
 import { parseEditorData } from "../utils/parseEditorData";
+import { AuthRequest } from "../middleware/authMiddleware";
 export const createBlog = async (req: Request, res: Response):Promise<void> => {
   try {
     const {blocks} = req.body;
@@ -10,11 +11,14 @@ export const createBlog = async (req: Request, res: Response):Promise<void> => {
     if(!title || !image || !content){
     res.status(400).json({message:'Empty data received',success:false});
     return;
-    }
+    };
+
+    const _req = req as AuthRequest;
     const newBlogPost = new blogModel({
       title,
       image,
       content,
+      author:_req.id,
     });
     await newBlogPost.save();
 

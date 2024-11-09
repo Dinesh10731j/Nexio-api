@@ -2,10 +2,12 @@ import { Request, Response } from "express";
 import { blogModel } from "./blog.model";
 import { parseEditorData } from "../utils/parseEditorData";
 import { AuthRequest } from "../middleware/authMiddleware";
+import { readingTime } from "../utils/readTime";
 export const createBlog = async (req: Request, res: Response):Promise<void> => {
   try {
     const {blocks} = req.body;
     const { title, image, content } = parseEditorData(blocks);
+    const readTime = readingTime(content)
 
 
     if(!title || !image || !content){
@@ -19,6 +21,7 @@ export const createBlog = async (req: Request, res: Response):Promise<void> => {
       image,
       content,
       author:_req.id,
+      readingTime:readTime
     });
     await newBlogPost.save();
 
@@ -54,7 +57,7 @@ if(!newBlogPost){
 
 export const Blogs = async (req:Request,res:Response):Promise<void>=>{
   try{
-    const blogs = await blogModel.find({});
+    const blogs = await blogModel.find({}).populate('author','name').sort({publishedDate:-1});
 
     if(!blogs || blogs.length === 0){
       res.status(404).json({message:'No blogs available.',success:false});

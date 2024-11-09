@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 
 const blogSchema = new mongoose.Schema(
   {
-    author: mongoose.Schema.Types.ObjectId,
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+    },
+
     title: { type: String, required: true },
     image: {
       url: String,
@@ -10,7 +14,15 @@ const blogSchema = new mongoose.Schema(
     },
 
     content: { type: String, required: true },
+    publishedDate: {
+      type: Date,
+      default: Date.now(),
+    },
+    readingTime:{
+      type:Number,
+    },
   },
+
   { timestamps: true }
 );
 

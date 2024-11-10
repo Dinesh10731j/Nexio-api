@@ -62,22 +62,18 @@ export const Blogs = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Blogs fetched successfully",
-        success: true,
-        Blogs: blogs,
-      });
+    res.status(200).json({
+      message: "Blogs fetched successfully",
+      success: true,
+      Blogs: blogs,
+    });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res
-        .status(500)
-        .json({
-          message: "Internal server error",
-          success: false,
-          error: error.message,
-        });
+      res.status(500).json({
+        message: "Internal server error",
+        success: false,
+        error: error.message,
+      });
     } else {
       res
         .status(500)
@@ -92,12 +88,14 @@ export const singleBlog = async (
 ): Promise<void> => {
   try {
     const { blogId } = req.params;
-    
+
     if (!blogId) {
       res.status(400).json({ message: "BlogId is required", success: false });
       return;
     }
-    const singleBlog = await blogModel.findById(blogId).populate('author','name');
+    const singleBlog = await blogModel
+      .findById(blogId)
+      .populate("author", "name");
 
     if (!singleBlog) {
       res.status(404).json({ message: "Blogs not found", success: false });
@@ -105,7 +103,11 @@ export const singleBlog = async (
 
     res
       .status(200)
-      .json({ message: "Blog feteched successfully", success: true,blog:singleBlog });
+      .json({
+        message: "Blog feteched successfully",
+        success: true,
+        blog: singleBlog,
+      });
   } catch (error: unknown) {
     if (error instanceof Error) {
       res.status(500).json({

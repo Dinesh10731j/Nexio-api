@@ -1,4 +1,4 @@
-import { configuration } from "./config/config";
+import {configuration}  from "./config/config";
 import userRouter from "./user/user.route";
 import blogRouter from "./blog/blog.routes";
 import connectDataBase from "./config/db";

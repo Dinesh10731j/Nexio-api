@@ -17,7 +17,7 @@ export const createBlog = async (
       return;
     }
 
-    const _req = req as AuthRequest;
+    const _req = req as unknown as AuthRequest;
     const newBlogPost = new blogModel({
       title,
       image,

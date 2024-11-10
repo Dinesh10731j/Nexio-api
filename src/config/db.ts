@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"
 import { configuration } from "./config";
 
 const connectDataBase = async ()=>{

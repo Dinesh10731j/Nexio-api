@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.singleBlog = exports.Blogs = exports.createBlog = void 0;
+exports.userPosts = exports.singleBlog = exports.Blogs = exports.createBlog = void 0;
 const blog_model_1 = require("./blog.model");
 const parseEditorData_1 = require("../utils/parseEditorData");
 const readTime_1 = require("../utils/readTime");
@@ -100,9 +100,7 @@ const singleBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (!singleBlog) {
             res.status(404).json({ message: "Blogs not found", success: false });
         }
-        res
-            .status(200)
-            .json({
+        res.status(200).json({
             message: "Blog feteched successfully",
             success: true,
             blog: singleBlog,
@@ -124,3 +122,36 @@ const singleBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.singleBlog = singleBlog;
+const userPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const _req = req;
+        console.log(_req === null || _req === void 0 ? void 0 : _req.id);
+        const posts = yield blog_model_1.blogModel.find({});
+        if (!posts) {
+            res.status(400).json({ message: "Post not found", success: false });
+            return;
+        }
+        res
+            .status(200)
+            .json({
+            message: "Posts fetched successfully",
+            success: true,
+            Posts: posts,
+        });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: "Internal server error ",
+                success: false,
+                error: error === null || error === void 0 ? void 0 : error.message,
+            });
+        }
+        else {
+            res
+                .status(500)
+                .json({ message: "An unknown error occured", success: false });
+        }
+    }
+});
+exports.userPosts = userPosts;

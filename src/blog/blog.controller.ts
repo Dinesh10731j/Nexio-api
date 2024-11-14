@@ -101,13 +101,11 @@ export const singleBlog = async (
       res.status(404).json({ message: "Blogs not found", success: false });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Blog feteched successfully",
-        success: true,
-        blog: singleBlog,
-      });
+    res.status(200).json({
+      message: "Blog feteched successfully",
+      success: true,
+      blog: singleBlog,
+    });
   } catch (error: unknown) {
     if (error instanceof Error) {
       res.status(500).json({
@@ -119,6 +117,40 @@ export const singleBlog = async (
       res
         .status(500)
         .json({ message: "An unknown error coccured", success: false });
+    }
+  }
+};
+
+export const userPosts = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const _req = req as unknown as AuthRequest;
+    console.log(_req?.id);
+
+    const posts = await blogModel.find({});
+
+    if (!posts) {
+      res.status(400).json({ message: "Post not found", success: false });
+      return;
+    }
+
+    res
+      .status(200)
+      .json({
+        message: "Posts fetched successfully",
+        success: true,
+        Posts: posts,
+      });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Internal server error ",
+        success: false,
+        error: error?.message,
+      });
+    } else {
+      res
+        .status(500)
+        .json({ message: "An unknown error occured", success: false });
     }
   }
 };

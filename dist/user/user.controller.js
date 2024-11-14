@@ -88,6 +88,7 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             message: "User login successfull",
             success: true,
             accessToken: token,
+            username: User === null || User === void 0 ? void 0 : User.name
         });
     }
     catch (error) {

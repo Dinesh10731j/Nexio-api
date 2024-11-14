@@ -99,6 +99,7 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
       message: "User login successfull",
       success: true,
       accessToken: token,
+      username:User?.name
     });
   } catch (error) {
     if (error instanceof Error) {

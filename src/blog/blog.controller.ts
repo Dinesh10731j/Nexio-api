@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { blogModel } from "./blog.model";
-import { parseEditorData } from "../utils/parseEditorData";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { readingTime } from "../utils/readTime";
 export const createBlog = async (
@@ -9,21 +8,18 @@ export const createBlog = async (
 ): Promise<void> => {
   try {
     const { blocks } = req.body;
-    const { title, image, content } = parseEditorData(blocks);
+    const content = blocks.map((block: { data: { text: unknown; }; }) => block.data.text).join(" ");
     const readTime = readingTime(content);
 
-    if (!title || !image || !content) {
-      res.status(400).json({ message: "Empty data received", success: false });
-      return;
-    }
+  
 
     const _req = req as unknown as AuthRequest;
     const newBlogPost = new blogModel({
-      title,
-      image,
+     
       content,
       author: _req.id,
       readingTime: readTime,
+      blocks,
     });
     await newBlogPost.save();
 

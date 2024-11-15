@@ -6,10 +6,9 @@ const parseEditorData = (editorData) => {
         throw new Error("Invalid data format: editorData should be an array.");
     }
     let title = '';
-    let image = { url: '', caption: '' };
+    let image = { file: '', url: '', caption: '' };
     let content = '';
     editorData.forEach((block) => {
-        var _a;
         switch (block.type) {
             case 'header':
                 {
@@ -23,7 +22,8 @@ const parseEditorData = (editorData) => {
                 {
                     const imageData = block.data;
                     image = {
-                        url: ((_a = imageData.file) === null || _a === void 0 ? void 0 : _a.url) || '',
+                        file: imageData.file,
+                        url: imageData.url,
                         caption: imageData.caption || '',
                     };
                     break;
@@ -44,7 +44,7 @@ const parseEditorData = (editorData) => {
             case 'table':
                 {
                     const tableData = block.data;
-                    const tableContent = tableData.content.map(row => row.join(' | ')).join('\n');
+                    const tableContent = tableData.content.map((row) => row.join(' | ')).join('\n');
                     content += `\n${tableContent}\n`;
                     break;
                 }

@@ -11,24 +11,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userPosts = exports.singleBlog = exports.Blogs = exports.createBlog = void 0;
 const blog_model_1 = require("./blog.model");
-const parseEditorData_1 = require("../utils/parseEditorData");
 const readTime_1 = require("../utils/readTime");
 const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { blocks } = req.body;
-        const { title, image, content } = (0, parseEditorData_1.parseEditorData)(blocks);
+        const content = blocks.map((block) => block.data.text).join(" ");
         const readTime = (0, readTime_1.readingTime)(content);
-        if (!title || !image || !content) {
-            res.status(400).json({ message: "Empty data received", success: false });
-            return;
-        }
         const _req = req;
         const newBlogPost = new blog_model_1.blogModel({
-            title,
-            image,
             content,
             author: _req.id,
             readingTime: readTime,
+            blocks,
         });
         yield newBlogPost.save();
         res

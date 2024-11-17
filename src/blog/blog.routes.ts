@@ -5,6 +5,6 @@ const blogRouter = Router();
 blogRouter.post("/blog/create-post",authenticateUser,createBlog);
 blogRouter.get("/blogs",Blogs);
 blogRouter.get('/:blogId',singleBlog);
-blogRouter.get("/blog/user-blogs",userPosts);
+blogRouter.get("/blog/user-blogs",authenticateUser,userPosts);
 
 export default blogRouter;

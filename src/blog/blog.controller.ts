@@ -2,35 +2,36 @@ import { Request, Response } from "express";
 import { blogModel } from "./blog.model";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { readingTime } from "../utils/readTime";
+
 export const createBlog = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { blocks } = req.body;
-    const content = blocks.map((block: { data: { text: unknown; }; }) => block.data.text).join(" ");
+    const content = blocks
+      .map((block: { data: { text: unknown } }) => block.data.text)
+      .join(" ");
     const readTime = readingTime(content);
-
-  
 
     const _req = req as unknown as AuthRequest;
     const newBlogPost = new blogModel({
-     
       content,
       author: _req.id,
       readingTime: readTime,
       blocks,
     });
     await newBlogPost.save();
-
-    res
-      .status(201)
-      .json({ message: "Blog post created successfully", data: newBlogPost });
-
     if (!newBlogPost) {
       res.status(400).json({ message: "Failed to create blog" });
       return;
     }
+
+  
+
+    res
+      .status(201)
+      .json({ message: "Blog post created successfully"});
   } catch (error: unknown) {
     if (error instanceof Error) {
       res.status(500).json({
@@ -120,33 +121,30 @@ export const singleBlog = async (
 export const userPosts = async (req: Request, res: Response): Promise<void> => {
   try {
     const _req = req as unknown as AuthRequest;
-    console.log(_req?.id);
+    const userId = _req.id;
 
-    const posts = await blogModel.find({});
+  
+    const posts = await blogModel.find({author:userId }).populate("author", "name");
 
-    if (!posts) {
-      res.status(400).json({ message: "Post not found", success: false });
+    if (!posts || posts.length === 0) {
+      res.status(404).json({ message: "No posts found for this user", success: false });
       return;
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Posts fetched successfully",
-        success: true,
-        Posts: posts,
-      });
+    res.status(200).json({
+      message: "Posts fetched successfully",
+      success: true,
+      Posts: posts,
+    });
   } catch (error: unknown) {
     if (error instanceof Error) {
       res.status(500).json({
-        message: "Internal server error ",
+        message: "Internal server error",
         success: false,
-        error: error?.message,
+        error: error.message,
       });
     } else {
-      res
-        .status(500)
-        .json({ message: "An unknown error occured", success: false });
+      res.status(500).json({ message: "An unknown error occurred", success: false });
     }
   }
 };

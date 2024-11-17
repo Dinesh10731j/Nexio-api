@@ -27,7 +27,7 @@ const blockSchema = new mongoose.Schema(
       ParagraphText: { type: String },
 
       // For list type (Add this part)
-      style: { type: String, enum: ["unordered", "ordered"] }, // Specify style of list
+      style: { type: String, enum: ["unordered", "ordered"] }, // Specifying style of list
       items: { type: [String], default: [] }, // Array of list items
     },
   },

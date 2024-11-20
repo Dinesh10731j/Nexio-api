@@ -41,7 +41,7 @@ const Signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 .json({ message: "Failed to create user", success: false });
             return;
         }
-        const token = jsonwebtoken_1.default.sign({ id: userData === null || userData === void 0 ? void 0 : userData._id }, config_1.configuration.JWT_SECRET, { expiresIn: "1h" });
+        const token = jsonwebtoken_1.default.sign({ id: userData === null || userData === void 0 ? void 0 : userData.id }, config_1.configuration.JWT_SECRET, { expiresIn: "1h" });
         res.status(201).json({
             message: "User created successfully",
             success: true,

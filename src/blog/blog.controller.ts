@@ -148,3 +148,37 @@ export const userPosts = async (req: Request, res: Response): Promise<void> => {
     }
   }
 };
+
+
+
+export const deletePost = async (req:Request,res:Response):Promise<void>=>{
+  try{
+    const {postId} = req.body;
+
+
+    if(postId === null || undefined){
+      res.status(400).json({message:'PostId is required',success:false});
+      return;
+    }
+
+    const userPost = await blogModel.findByIdAndDelete(postId);
+
+
+    if(!userPost){
+      res.status(400).json({message:'Failed to delete post',success:false});
+      return;
+    }
+
+
+    res.status(200).json({message:'Post deleted successfuly',success:true});
+
+  }catch(error:unknown){
+    if(error instanceof Error){
+
+      res.status(500).json({message:'Internal server error',success:false,error:error?.message});
+      
+    }else{
+      res.status(500).json({message:'An unknown error occured',success:false})
+    }
+  }
+}

@@ -27,7 +27,7 @@ const blockSchema = new mongoose_1.default.Schema({
         // For paragraph type
         ParagraphText: { type: String },
         // For list type (Add this part)
-        style: { type: String, enum: ["unordered", "ordered"] }, // Specify style of list
+        style: { type: String, enum: ["unordered", "ordered"] }, // Specifying style of list
         items: { type: [String], default: [] }, // Array of list items
     },
 }, { _id: false } // Disabling _id for nested blocks for cleaner documents

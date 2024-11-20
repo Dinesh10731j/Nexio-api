@@ -9,13 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userPosts = exports.singleBlog = exports.Blogs = exports.createBlog = void 0;
+exports.deletePost = exports.userPosts = exports.singleBlog = exports.Blogs = exports.createBlog = void 0;
 const blog_model_1 = require("./blog.model");
 const readTime_1 = require("../utils/readTime");
 const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { blocks } = req.body;
-        const content = blocks.map((block) => block.data.text).join(" ");
+        const content = blocks
+            .map((block) => block.data.text)
+            .join(" ");
         const readTime = (0, readTime_1.readingTime)(content);
         const _req = req;
         const newBlogPost = new blog_model_1.blogModel({
@@ -25,13 +27,13 @@ const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             blocks,
         });
         yield newBlogPost.save();
-        res
-            .status(201)
-            .json({ message: "Blog post created successfully", data: newBlogPost });
         if (!newBlogPost) {
             res.status(400).json({ message: "Failed to create blog" });
             return;
         }
+        res
+            .status(201)
+            .json({ message: "Blog post created successfully" });
     }
     catch (error) {
         if (error instanceof Error) {
@@ -119,15 +121,13 @@ exports.singleBlog = singleBlog;
 const userPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const _req = req;
-        console.log(_req === null || _req === void 0 ? void 0 : _req.id);
-        const posts = yield blog_model_1.blogModel.find({});
-        if (!posts) {
-            res.status(400).json({ message: "Post not found", success: false });
+        const userId = _req.id;
+        const posts = yield blog_model_1.blogModel.find({ author: userId }).populate("author", "name");
+        if (!posts || posts.length === 0) {
+            res.status(404).json({ message: "No posts found for this user", success: false });
             return;
         }
-        res
-            .status(200)
-            .json({
+        res.status(200).json({
             message: "Posts fetched successfully",
             success: true,
             Posts: posts,
@@ -136,16 +136,38 @@ const userPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     catch (error) {
         if (error instanceof Error) {
             res.status(500).json({
-                message: "Internal server error ",
+                message: "Internal server error",
                 success: false,
-                error: error === null || error === void 0 ? void 0 : error.message,
+                error: error.message,
             });
         }
         else {
-            res
-                .status(500)
-                .json({ message: "An unknown error occured", success: false });
+            res.status(500).json({ message: "An unknown error occurred", success: false });
         }
     }
 });
 exports.userPosts = userPosts;
+const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { postId } = req.body;
+        if (postId === null || undefined) {
+            res.status(400).json({ message: 'PostId is required', success: false });
+            return;
+        }
+        const userPost = yield blog_model_1.blogModel.findByIdAndDelete(postId);
+        if (!userPost) {
+            res.status(400).json({ message: 'Failed to delete post', success: false });
+            return;
+        }
+        res.status(200).json({ message: 'Post deleted successfuly', success: true });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: 'Internal server error', success: false, error: error === null || error === void 0 ? void 0 : error.message });
+        }
+        else {
+            res.status(500).json({ message: 'An unknown error occured', success: false });
+        }
+    }
+});
+exports.deletePost = deletePost;

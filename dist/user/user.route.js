@@ -9,4 +9,5 @@ const userRouter = express_1.default.Router();
 userRouter.post("/user/signup", user_controller_1.Signup);
 userRouter.post("/user/login", user_controller_1.Login);
 userRouter.post("/user/message", user_controller_1.userContact);
+userRouter.post("/user/profile/image", user_controller_1.userProfileImage);
 exports.default = userRouter;

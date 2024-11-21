@@ -41,3 +41,4 @@ export interface Block {
   type: 'header' | 'image' | 'paragraph' | 'list' | 'table';
   data: HeaderData | ImageData | ParagraphData | ListData | TableData;
 }
+

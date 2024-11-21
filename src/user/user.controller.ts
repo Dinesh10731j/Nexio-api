@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { signupModel, contactModel } from "./user.model";
+import { signupModel, contactModel,userProfileModel } from "./user.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { configuration } from "../config/config";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 export const Signup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -159,3 +160,46 @@ export const userContact = async (
     }
   }
 };
+
+
+
+
+export const userProfileImage = async (req:Request,res:Response):Promise<void>=>{
+  try{
+
+    const {profileUrl} = req.body;
+
+    const _req = req as unknown as  AuthRequest;
+    const userId = _req?.id;
+
+
+if(!profileUrl){
+  res.status(400).json({message:'ProfileUrl is required',success:false});
+  return;
+}
+
+    if(!userId){
+      res.status(400).json({message:'UserId is required',success:false});
+
+      return;
+    }
+
+  const userProfile = await userProfileModel.create({profileUrl,userId});
+
+if(!userProfile){
+  res.status(500).json({message:'Failed to create profile Image',success:false});
+  return;
+}
+
+
+res.status(201).json({message:'Profile image uploaded successfully',success:true});
+
+  }catch(error:unknown){
+    if(error instanceof Error){
+      res.status(500).json({message:'Internal server error',success:false});
+    }else{
+      res.status(500).json({message:'An unknown error occured',success:false});
+    }
+  }
+
+}

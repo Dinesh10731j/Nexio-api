@@ -35,6 +35,21 @@ const contactSchema = new mongoose.Schema<contactType>({
   },
 });
 
+const userProfileSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+    required: [true, "UserId is required"],
+  },
+
+  profileUrl: String,
+});
+
+export const userProfileModel = mongoose.model(
+  "UserProfiles",
+  userProfileSchema
+);
+
 export const contactModel = mongoose.model<contactType>(
   "Contacts",
   contactSchema

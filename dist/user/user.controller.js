@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userContact = exports.Login = exports.Signup = void 0;
+exports.userProfileImage = exports.userContact = exports.Login = exports.Signup = void 0;
 const user_model_1 = require("./user.model");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -144,3 +144,33 @@ const userContact = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.userContact = userContact;
+const userProfileImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { profileUrl } = req.body;
+        const _req = req;
+        const userId = _req === null || _req === void 0 ? void 0 : _req.id;
+        if (!profileUrl) {
+            res.status(400).json({ message: 'ProfileUrl is required', success: false });
+            return;
+        }
+        if (!userId) {
+            res.status(400).json({ message: 'UserId is required', success: false });
+            return;
+        }
+        const userProfile = yield user_model_1.userProfileModel.create({ profileUrl, userId });
+        if (!userProfile) {
+            res.status(500).json({ message: 'Failed to create profile Image', success: false });
+            return;
+        }
+        res.status(201).json({ message: 'Profile image uploaded successfully', success: true });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: 'Internal server error', success: false });
+        }
+        else {
+            res.status(500).json({ message: 'An unknown error occured', success: false });
+        }
+    }
+});
+exports.userProfileImage = userProfileImage;

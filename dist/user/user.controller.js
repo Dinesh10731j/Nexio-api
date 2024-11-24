@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userProfileImage = exports.userContact = exports.Login = exports.Signup = void 0;
+exports.profileImage = exports.userProfileImage = exports.userContact = exports.Login = exports.Signup = void 0;
 const user_model_1 = require("./user.model");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -88,7 +88,7 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             message: "User login successfull",
             success: true,
             accessToken: token,
-            username: User === null || User === void 0 ? void 0 : User.name
+            username: User === null || User === void 0 ? void 0 : User.name,
         });
     }
     catch (error) {
@@ -118,15 +118,21 @@ const userContact = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
         const alreadyExists = yield user_model_1.contactModel.findOne({ email });
         if (alreadyExists) {
-            res.status(400).json({ message: "Message already exits", success: false });
+            res
+                .status(400)
+                .json({ message: "Message already exits", success: false });
             return;
         }
         const userContacts = yield user_model_1.contactModel.create({ name, email, message });
         if (!userContacts) {
-            res.status(500).json({ message: "Failed to create message", success: false });
+            res
+                .status(500)
+                .json({ message: "Failed to create message", success: false });
             return;
         }
-        res.status(201).json({ message: "Message created sucessfully", success: true });
+        res
+            .status(201)
+            .json({ message: "Message created sucessfully", success: true });
     }
     catch (error) {
         if (error instanceof Error) {
@@ -150,27 +156,70 @@ const userProfileImage = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const _req = req;
         const userId = _req === null || _req === void 0 ? void 0 : _req.id;
         if (!profileUrl) {
-            res.status(400).json({ message: 'ProfileUrl is required', success: false });
+            res
+                .status(400)
+                .json({ message: "ProfileUrl is required", success: false });
             return;
         }
         if (!userId) {
-            res.status(400).json({ message: 'UserId is required', success: false });
+            res.status(400).json({ message: "UserId is required", success: false });
             return;
         }
         const userProfile = yield user_model_1.userProfileModel.create({ profileUrl, userId });
         if (!userProfile) {
-            res.status(500).json({ message: 'Failed to create profile Image', success: false });
+            res
+                .status(500)
+                .json({ message: "Failed to create profile Image", success: false });
             return;
         }
-        res.status(201).json({ message: 'Profile image uploaded successfully', success: true });
+        res
+            .status(201)
+            .json({ message: "Profile image uploaded successfully", success: true });
     }
     catch (error) {
         if (error instanceof Error) {
-            res.status(500).json({ message: 'Internal server error', success: false });
+            res
+                .status(500)
+                .json({ message: "Internal server error", success: false });
         }
         else {
-            res.status(500).json({ message: 'An unknown error occured', success: false });
+            res
+                .status(500)
+                .json({ message: "An unknown error occured", success: false });
         }
     }
 });
 exports.userProfileImage = userProfileImage;
+const profileImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const _req = req;
+        const userId = _req === null || _req === void 0 ? void 0 : _req.id;
+        const userProfile = yield user_model_1.userProfileModel.findOne({ userId });
+        if (!userProfile) {
+            res
+                .status(404)
+                .json({ message: "User profile not found", success: false });
+            return;
+        }
+        res
+            .status(200)
+            .json({ message: "User profile fetched successfully", success: true, profile: userProfile });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res
+                .status(500)
+                .json({
+                message: "Internal server",
+                success: false,
+                error: error === null || error === void 0 ? void 0 : error.message,
+            });
+        }
+        else {
+            res
+                .status(500)
+                .json({ message: "An unknown error occured", success: false });
+        }
+    }
+});
+exports.profileImage = profileImage;

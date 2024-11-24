@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { signupModel, contactModel,userProfileModel } from "./user.model";
+import { signupModel, contactModel, userProfileModel } from "./user.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { configuration } from "../config/config";
@@ -100,7 +100,7 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
       message: "User login successfull",
       success: true,
       accessToken: token,
-      username:User?.name
+      username: User?.name,
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -134,18 +134,24 @@ export const userContact = async (
     const alreadyExists = await contactModel.findOne({ email });
 
     if (alreadyExists) {
-      res.status(400).json({ message: "Message already exits", success: false });
+      res
+        .status(400)
+        .json({ message: "Message already exits", success: false });
       return;
     }
 
     const userContacts = await contactModel.create({ name, email, message });
 
     if (!userContacts) {
-      res.status(500).json({ message: "Failed to create message", success: false });
+      res
+        .status(500)
+        .json({ message: "Failed to create message", success: false });
       return;
     }
 
-    res.status(201).json({ message: "Message created sucessfully", success: true });
+    res
+      .status(201)
+      .json({ message: "Message created sucessfully", success: true });
   } catch (error: unknown) {
     if (error instanceof Error) {
       res.status(500).json({
@@ -161,45 +167,89 @@ export const userContact = async (
   }
 };
 
+export const userProfileImage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { profileUrl } = req.body;
 
-
-
-export const userProfileImage = async (req:Request,res:Response):Promise<void>=>{
-  try{
-
-    const {profileUrl} = req.body;
-
-    const _req = req as unknown as  AuthRequest;
+    const _req = req as unknown as AuthRequest;
     const userId = _req?.id;
 
+    if (!profileUrl) {
+      res
+        .status(400)
+        .json({ message: "ProfileUrl is required", success: false });
+      return;
+    }
 
-if(!profileUrl){
-  res.status(400).json({message:'ProfileUrl is required',success:false});
-  return;
-}
-
-    if(!userId){
-      res.status(400).json({message:'UserId is required',success:false});
+    if (!userId) {
+      res.status(400).json({ message: "UserId is required", success: false });
 
       return;
     }
 
-  const userProfile = await userProfileModel.create({profileUrl,userId});
+    const userProfile = await userProfileModel.create({ profileUrl, userId });
 
-if(!userProfile){
-  res.status(500).json({message:'Failed to create profile Image',success:false});
-  return;
-}
+    if (!userProfile) {
+      res
+        .status(500)
+        .json({ message: "Failed to create profile Image", success: false });
+      return;
+    }
 
-
-res.status(201).json({message:'Profile image uploaded successfully',success:true});
-
-  }catch(error:unknown){
-    if(error instanceof Error){
-      res.status(500).json({message:'Internal server error',success:false});
-    }else{
-      res.status(500).json({message:'An unknown error occured',success:false});
+    res
+      .status(201)
+      .json({ message: "Profile image uploaded successfully", success: true });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: "Internal server error", success: false });
+    } else {
+      res
+        .status(500)
+        .json({ message: "An unknown error occured", success: false });
     }
   }
+};
 
-}
+export const profileImage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const _req = req as unknown as AuthRequest;
+    const userId = _req?.id;
+
+
+
+    const userProfile = await userProfileModel.findOne({ userId });
+
+    if (!userProfile) {
+      res
+        .status(404)
+        .json({ message: "User profile not found", success: false });
+      return;
+    }
+
+    res
+      .status(200)
+      .json({ message: "User profile fetched successfully", success: true,profile:userProfile });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({
+          message: "Internal server",
+          success: false,
+          error: error?.message,
+        });
+    } else {
+      res
+        .status(500)
+        .json({ message: "An unknown error occured", success: false });
+    }
+  }
+};

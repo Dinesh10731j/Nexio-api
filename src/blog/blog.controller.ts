@@ -182,3 +182,40 @@ export const deletePost = async (req:Request,res:Response):Promise<void>=>{
     }
   }
 }
+
+
+
+export const countViews = async (req:Request,res:Response):Promise<void>=>{
+  try{
+
+    const {blogId} = req.params;
+
+
+    if(!blogId){
+
+      res.status(400).json({message:'BlogId is missing',success:false});
+
+      return;
+    }
+
+
+    const blogs = await blogModel.findByIdAndUpdate(blogId,{$inc:{views:1}});
+
+    if(!blogs){
+      res.status(404).json({message:'Blog not found',success:false});
+      return;
+    }
+
+
+
+    res.status(200).json({blogs:blogs,message:'Blogs feteched successfully',success:true});
+
+  }catch(error:unknown){
+
+    if(error instanceof Error){
+      res.status(500).json({message:'Internal server error',success:false,error:error?.message});
+    }else{
+      res.status(500).json({message:'An unknown error occured',success:false});
+    }
+  }
+}

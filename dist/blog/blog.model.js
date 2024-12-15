@@ -47,5 +47,6 @@ const blogSchema = new mongoose_1.default.Schema({
         type: Number,
         default: 0,
     },
+    views: { type: Number, default: 0 },
 }, { timestamps: true });
 exports.blogModel = mongoose_1.default.model("Blogs", blogSchema);

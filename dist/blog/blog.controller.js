@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePost = exports.userPosts = exports.singleBlog = exports.Blogs = exports.createBlog = void 0;
+exports.countViews = exports.deletePost = exports.userPosts = exports.singleBlog = exports.Blogs = exports.createBlog = void 0;
 const blog_model_1 = require("./blog.model");
 const readTime_1 = require("../utils/readTime");
 const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -171,3 +171,27 @@ const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.deletePost = deletePost;
+const countViews = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { blogId } = req.params;
+        if (!blogId) {
+            res.status(400).json({ message: 'BlogId is missing', success: false });
+            return;
+        }
+        const blogs = yield blog_model_1.blogModel.findByIdAndUpdate(blogId, { $inc: { views: 1 } });
+        if (!blogs) {
+            res.status(404).json({ message: 'Blog not found', success: false });
+            return;
+        }
+        res.status(200).json({ blogs: blogs, message: 'Blogs feteched successfully', success: true });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: 'Internal server error', success: false, error: error === null || error === void 0 ? void 0 : error.message });
+        }
+        else {
+            res.status(500).json({ message: 'An unknown error occured', success: false });
+        }
+    }
+});
+exports.countViews = countViews;

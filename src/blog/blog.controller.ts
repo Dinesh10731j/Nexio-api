@@ -213,7 +213,7 @@ export const countViews = async (req:Request,res:Response):Promise<void>=>{
   }catch(error:unknown){
 
     if(error instanceof Error){
-      res.status(500).json({message:'Internal server errorrrrrrr',success:false,error:error?.message});
+      res.status(500).json({message:'Internal server error',success:false,error:error?.message});
     }else{
       res.status(500).json({message:'An unknown error occured',success:false});
     }
@@ -225,9 +225,9 @@ export const blogPagination = async (req: Request, res: Response) => {
   try {
  
     const page = parseInt(req.query.page as string) || 1;
-    console.log('This is page',page);
-    const limit = parseInt(req.query.limit as string) || 4;
-    console.log('This is limit',limit);
+    
+    const limit = parseInt(req.query.limit as string) || 6;
+   
     const skip = (page - 1) * limit;
 
     

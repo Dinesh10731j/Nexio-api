@@ -10,4 +10,5 @@ blogRouter.get('/:blogId', blog_controller_1.singleBlog);
 blogRouter.get("/blog/user-blogs", authMiddleware_1.authenticateUser, blog_controller_1.userPosts);
 blogRouter.delete("/delete-post", blog_controller_1.deletePost);
 blogRouter.get('/blog/views/:blogId', blog_controller_1.countViews);
+blogRouter.get('/blog/items', blog_controller_1.blogPagination);
 exports.default = blogRouter;

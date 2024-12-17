@@ -199,7 +199,7 @@ export const countViews = async (req:Request,res:Response):Promise<void>=>{
     }
 
 
-    const blogs = await blogModel.findByIdAndUpdate(blogId,{$inc:{views:1}});
+    const blogs = await blogModel.findByIdAndUpdate(blogId,{$inc:{views:1}},{new:true});
 
     if(!blogs){
       res.status(404).json({message:'Blog not found',success:false});
@@ -213,9 +213,46 @@ export const countViews = async (req:Request,res:Response):Promise<void>=>{
   }catch(error:unknown){
 
     if(error instanceof Error){
-      res.status(500).json({message:'Internal server error',success:false,error:error?.message});
+      res.status(500).json({message:'Internal server errorrrrrrr',success:false,error:error?.message});
     }else{
       res.status(500).json({message:'An unknown error occured',success:false});
     }
   }
 }
+
+
+export const blogPagination = async (req: Request, res: Response) => {
+  try {
+ 
+    const page = parseInt(req.query.page as string) || 1;
+    console.log('This is page',page);
+    const limit = parseInt(req.query.limit as string) || 4;
+    console.log('This is limit',limit);
+    const skip = (page - 1) * limit;
+
+    
+    const blogs = await blogModel.find().skip(skip).limit(limit);
+    const totalBlogs = await blogModel.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      currentPage: page,
+      totalPages: Math.ceil(totalBlogs / limit),
+      totalBlogs,
+      data: blogs,
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Internal server error",
+        success: false,
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "An unknown error occurred",
+        success: false,
+      });
+    }
+  }
+};

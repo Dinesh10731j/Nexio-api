@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.countViews = exports.deletePost = exports.userPosts = exports.singleBlog = exports.Blogs = exports.createBlog = void 0;
+exports.blogPagination = exports.countViews = exports.deletePost = exports.userPosts = exports.singleBlog = exports.Blogs = exports.createBlog = void 0;
 const blog_model_1 = require("./blog.model");
 const readTime_1 = require("../utils/readTime");
 const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -178,7 +178,7 @@ const countViews = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             res.status(400).json({ message: 'BlogId is missing', success: false });
             return;
         }
-        const blogs = yield blog_model_1.blogModel.findByIdAndUpdate(blogId, { $inc: { views: 1 } });
+        const blogs = yield blog_model_1.blogModel.findByIdAndUpdate(blogId, { $inc: { views: 1 } }, { new: true });
         if (!blogs) {
             res.status(404).json({ message: 'Blog not found', success: false });
             return;
@@ -195,3 +195,35 @@ const countViews = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.countViews = countViews;
+const blogPagination = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 6;
+        const skip = (page - 1) * limit;
+        const blogs = yield blog_model_1.blogModel.find().skip(skip).limit(limit);
+        const totalBlogs = yield blog_model_1.blogModel.countDocuments();
+        res.status(200).json({
+            success: true,
+            currentPage: page,
+            totalPages: Math.ceil(totalBlogs / limit),
+            totalBlogs,
+            data: blogs,
+        });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: "Internal server error",
+                success: false,
+                error: error.message,
+            });
+        }
+        else {
+            res.status(500).json({
+                message: "An unknown error occurred",
+                success: false,
+            });
+        }
+    }
+});
+exports.blogPagination = blogPagination;

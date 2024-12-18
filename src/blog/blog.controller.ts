@@ -231,7 +231,7 @@ export const blogPagination = async (req: Request, res: Response) => {
     const skip = (page - 1) * limit;
 
     
-    const blogs = await blogModel.find().skip(skip).limit(limit);
+    const blogs = await blogModel.find().populate("author","name").skip(skip).limit(limit);
     const totalBlogs = await blogModel.countDocuments();
 
     res.status(200).json({

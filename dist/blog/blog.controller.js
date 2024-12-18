@@ -200,7 +200,7 @@ const blogPagination = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 6;
         const skip = (page - 1) * limit;
-        const blogs = yield blog_model_1.blogModel.find().skip(skip).limit(limit);
+        const blogs = yield blog_model_1.blogModel.find().populate("author", "name").skip(skip).limit(limit);
         const totalBlogs = yield blog_model_1.blogModel.countDocuments();
         res.status(200).json({
             success: true,

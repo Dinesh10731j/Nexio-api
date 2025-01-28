@@ -6,7 +6,7 @@ const blockSchema = new mongoose.Schema(
     id: { type: String, required: true },
     type: {
       type: String,
-      enum: ["header", "image", "paragraph", "list"],
+      enum: ["header", "image", "paragraph", "list" ,"code"],
       required: true,
     },
     data: {
@@ -25,6 +25,11 @@ const blockSchema = new mongoose.Schema(
 
       // For paragraph type
       ParagraphText: { type: String },
+    //For Code
+
+    codeData: {
+      code: { type:String }, // Store the actual code content here
+    },
 
       // For list type (Add this part)
       style: { type: String, enum: ["unordered", "ordered"] }, // Specifying style of list

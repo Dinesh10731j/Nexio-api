@@ -36,9 +36,13 @@ export interface TableData {
   content: string[][];
 }
 
+export interface codeData{
+  text:string;
+}
+
 export interface Block {
   id: string;
-  type: 'header' | 'image' | 'paragraph' | 'list' | 'table';
-  data: HeaderData | ImageData | ParagraphData | ListData | TableData;
+  type: 'header' | 'image' | 'paragraph' | 'list' | 'table' | 'code';
+  data: HeaderData | ImageData | ParagraphData | ListData | TableData | codeData;
 }
 
